@@ -1,0 +1,38 @@
+{
+    "orgaos": [
+        "Coração",
+        "Rins",
+        "Fígado",
+        "Pâncreas",
+        "Pulmões",
+        "Intestino",
+        "Córneas",
+        "Pele",
+        "Ossos",
+        "Válvulas cardíacas",
+        "Cartilagem",
+        "Medula Óssea",
+        "Tendões",
+        "Vasos Sanguíneos",
+        "Sangue de Cordão Umbilical",
+        "Sangue Universal"
+    ],
+    "tipos_de_orgaos": [
+        "Órgão",
+        "Órgão",
+        "Órgão",
+        "Órgão",
+        "Órgão",
+        "Órgão",
+        "Tecido",
+        "Tecido",
+        "Tecido",
+        "Tecido",
+        "Tecido",
+        "Tecido",
+        "Tecido",
+        "Tecido",
+        "Sangue",
+        "Sangue"
+    ]
+}
