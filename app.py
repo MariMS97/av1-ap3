@@ -1,13 +1,12 @@
 
 import json
-from utils_validadores import gerar_id_simples
+from utils import gerar_id_simples
 from Doador import Doador
 from Receptor import Receptor
 from AdministradorSistema import AdministradorSistema
 from Doacao import Doacao
 from CentroDistribuicao import CentroDistribuicao
-from IntencaoDoar import IntencaoDoar
-
+from utils import gerar_id_simples
 
 # Função para carregar dados JSON
 def carregar_dados_json(arquivo):
@@ -88,34 +87,15 @@ def cadastro_receptor():
 
     # Necessidades médicas
     orgao_necessario = input("Órgão necessário: ")
-    gravidade_condicao = input("Gravidade da condição (Leve/Moderada/Grave/Gravissima): ")
+    gravidade_condicao = input("Gravidade da condição (Leve/Moderada/Grave/Gravíssima): ")
     centro_transplante = input("Centro de transplante vinculado: ")
     posicao_lista_espera = input("Posição na lista de espera: ")
 
-    id_receptor = gerar_id_simples("receptores.json")  # Gera ID sequencial
+    receptores = carregar_dados_json('receptores.json')
+    id_receptor = gerar_id_simples("receptores.json")
 
-    receptor = Receptor(
-        id=id_receptor,
-        nome=nome,
-        idade=idade,
-        genero=genero,
-        data_nascimento=data_nascimento,
-        cidade_natal=cidade_natal,
-        estado_natal=estado_natal,
-        cpf=cpf,
-        profissao=profissao,
-        cidade_residencia=cidade_residencia,
-        estado_residencia=estado_residencia,
-        estado_civil=estado_civil,
-        orgao_necessario=orgao_necessario,
-        gravidade_condicao=gravidade_condicao,
-        centro_transplante_vinculado=centro_transplante,
-        contato_emergencia=contato_emergencia,
-        posicao_lista_espera=posicao_lista_espera
-    )
-
-    # Montar o dicionário no mesmo formato do JSON
-    receptor_dict = {
+    novo_receptor = {
+        "id": id_receptor,
         "dados": {
             "id": id_receptor,
             "nome": nome,
@@ -139,65 +119,100 @@ def cadastro_receptor():
         }
     }
 
-    receptores = carregar_dados_json('receptores.json')
-    id_gerado = gerar_id_simples(receptores)
-
-    novo_receptor = {
-        "id": id_gerado,
-        "dados": receptor_dict["dados"],
-        "necessidade": receptor_dict["necessidade"]
-    }
-
     receptores.append(novo_receptor)
     salvar_dados_json('receptores.json', receptores)
 
     print("Receptor cadastrado com sucesso!")
 
 def cadastro_administrador():
+    administradores = carregar_dados_json('admins.json')
     try:
-        print("\nCadastro de Administrador")
+        print("\n--- Cadastro de Administrador ---")
         
-        # Dados pessoais
+        # Gerando um ID único para o novo administrador
+        novo_id = gerar_id_simples('admins.json')
+
+        # Entrando com os dados de acesso
+        nome_usuario = input("Nome de usuário: ").strip()
+        
+        # Verifica se o nome de usuário já está em uso
+        administradores = AdministradorSistema.carregar_dados()
+        if any(admin["acesso"]["nome_usuario"] == nome_usuario for admin in administradores):
+            print(f"Erro: o nome de usuário '{nome_usuario}' já está em uso.")
+            return
+
+        senha = input("Senha: ").strip()
+
+        # Entrando com os dados pessoais
+        nome = input("Nome completo: ").strip()
+        idade = int(input("Idade: "))
+        if idade <= 0 or idade > 80:
+            raise ValueError("Idade inválida.")
+
+        sexo = input("Sexo (M/F): ").strip().upper()
+        data_nascimento = input("Data nascimento (DD/MM/AAAA): ").strip()
+        cidade_natal = input("Cidade natal: ").strip()
+        estado_natal = input("Estado natal (sigla): ").strip().upper()
+        cpf = input("CPF (apenas números): ").strip()
+        if not cpf.isdigit() or len(cpf) != 11:
+            raise ValueError("CPF inválido. Deve conter exatamente 11 dígitos numéricos.")
+        
+        profissao = input("Profissão: ").strip()
+        cidade_residencia = input("Cidade residência: ").strip()
+        estado_residencia = input("Estado residência (sigla): ").strip().upper()
+        estado_civil = input("Estado civil: ").strip()
+        contato_emergencia = input("Contato emergência: ").strip()
+        tipo_sanguineo = input("Tipo sanguíneo: ").strip().upper()
+
+        # Criando o dicionário de dados pessoais do novo administrador
         dados_pessoais = {
-            "id": int(input("ID: ")),
-            "nome": input("Nome completo: ").strip(),
-            "idade": int(input("Idade: ")),
-            "sexo": input("Sexo (M/F): ").strip().upper(),
-            "data_nascimento": input("Data nascimento (DD/MM/AAAA): ").strip(),
-            "cidade_natal": input("Cidade natal: ").strip(),
-            "estado_natal": input("Estado natal (sigla): ").strip(),
-            "cpf": input("CPF: ").strip(),
-            "profissao": input("Profissão: ").strip(),
-            "cidade_residencia": input("Cidade residência: ").strip(),
-            "estado_residencia": input("Estado residência (sigla): ").strip(),
-            "estado_civil": input("Estado civil: ").strip(),
-            "contato_emergencia": input("Contato emergência: ").strip(),
-            "tipo_sanguineo": input("Tipo sanguíneo: ").strip()
+            "id": novo_id,
+            "nome": nome,
+            "idade": idade,
+            "sexo": sexo,
+            "data_nascimento": data_nascimento,
+            "cidade_natal": cidade_natal,
+            "estado_natal": estado_natal,
+            "cpf": cpf,
+            "profissao": profissao,
+            "cidade_residencia": cidade_residencia,
+            "estado_residencia": estado_residencia,
+            "estado_civil": estado_civil,
+            "contato_emergencia": contato_emergencia,
+            "tipo_sanguineo": tipo_sanguineo
         }
-        
-        # Dados de acesso
+
+        # Criando o dicionário de acesso do novo administrador
         acesso = {
-            "nome_usuario": input("Nome de usuário: ").strip(),
-            "senha": input("Senha: ").strip()
+            "nome_usuario": nome_usuario,
+            "senha": senha
         }
-        
-        # Cria e cadastra o administrador
+
+        # Instanciando o objeto AdministradorSistema
         admin = AdministradorSistema(dados_pessoais, acesso)
+
+        # Chama o método de cadastro do administrador
         resultado = admin.cadastrar()
-        print(resultado)
-        
-    except ValueError as e:
-        print(f"\nErro nos dados: {e}")
+
+        salvar_dados_json('admins.json', administradores)
+       
+
+        # Exibe mensagem de sucesso
+        print(f"\n{resultado}")
+
+    except ValueError as ve:
+        print(f"\n[Erro de Validação] {ve}")
     except Exception as e:
-        print(f"\nErro ao cadastrar: {str(e)}")
+        print(f"\n[Erro Inesperado] {str(e)}")
+
 
 def login_administrador():
-    nome_usuario = input("Digite o nome de usuário: ")
-    senha = input("Digite a senha: ")
+    nome_usuario = input("Digite o nome de usuário: ").strip()
+    senha = input("Digite a senha: ").strip()
     
-    administradores = carregar_dados_json('adminis.json')
+    administradores = carregar_dados_json('admins.json')
     for admin in administradores:
-        if admin['nome_usuario'] == nome_usuario and admin['senha'] == senha:
+        if admin['acesso']['nome_usuario'] == nome_usuario and admin['acesso']['senha'] == senha:
             print("Login bem-sucedido!")
             return True
     print("Credenciais inválidas!")
@@ -339,7 +354,7 @@ def editar_receptor():
 def buscar_doador():
     doador_id = input("Digite o ID ou CPF do doador: ")
     doadores = carregar_dados_json('potenciais_doadores.json')
-    doador = next((d for d in doadores if d['dados']['id'] == doador_id or d['dados']['cpf'] == doador_id), None)
+    doador = next((d for d in doadores if str(d['dados']['id']) == doador_id or d['dados']['cpf'] == doador_id), None)
     if doador:
         print(f"ID: {doador['dados']['id']} | Nome: {doador['dados']['nome']} | CPF: {doador['dados']['cpf']}")
     else:
@@ -349,7 +364,7 @@ def buscar_doador():
 def buscar_receptor():
     receptor_id = input("Digite o ID ou CPF do receptor: ")
     receptores = carregar_dados_json('receptores.json')
-    receptor = next((r for r in receptores if r['dados']['id'] == receptor_id or r['dados']['cpf'] == receptor_id), None)
+    receptor = next((r for r in receptores if str(r['dados']['id']) == receptor_id or r['dados']['cpf'] == receptor_id), None)
     if receptor:
         print(f"ID: {receptor['dados']['id']} | Nome: {receptor['dados']['nome']} | Órgão Necessário: {receptor['necessidade']['orgao_necessario']}")
     else:
