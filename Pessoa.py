@@ -109,10 +109,6 @@ class Pessoa(ABC):
     def buscar(self, identificador):
         pass
 
-    @abstractmethod
-    def excluir(self):
-        pass
-
     # Método especial para representar o objeto como string
     def __str__(self):
         return f"{self.__class__.__name__}: {self.nome} (ID: {self.id}, CPF: {self.cpf})"
