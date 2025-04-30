@@ -6,7 +6,7 @@ from Receptor import Receptor
 from AdministradorSistema import AdministradorSistema
 from Doacao import Doacao
 from CentroDistribuicao import CentroDistribuicao
-from utils import gerar_id_simples
+
 
 # Função para carregar dados JSON
 def carregar_dados_json(arquivo):
@@ -124,6 +124,7 @@ def cadastro_receptor():
 
     print("Receptor cadastrado com sucesso!")
 
+# Função para cadastrar um novo administrador
 def cadastro_administrador():
     administradores = carregar_dados_json('admins.json')
     try:
@@ -205,7 +206,7 @@ def cadastro_administrador():
     except Exception as e:
         print(f"\n[Erro Inesperado] {str(e)}")
 
-
+# Função para login do administrador
 def login_administrador():
     nome_usuario = input("Digite o nome de usuário: ").strip()
     senha = input("Digite a senha: ").strip()
@@ -218,15 +219,18 @@ def login_administrador():
     print("Credenciais inválidas!")
     return False
 
+# Função para logout do administrador
 def logout_administrador():
     print("Logout realizado com sucesso!")
     return True
 
+# Função para recuperar senha
 def recuperar_senha():
     email = input("Digite o email cadastrado: ")
     print(f"Instruções para redefinição enviadas para {email}")
     return True
 
+#função para gerenciar pessoas (doadores e receptores)
 def gerenciar_pessoas():
     print("\n=== Gerenciamento de Pessoas ===")
     print("1. Listar doadores")
@@ -244,6 +248,7 @@ def gerenciar_pessoas():
     else:
         print("Opção inválida!")
 
+#Função para mostrar órgãos e tipos
 def mostrar_orgaos_tipos():
     print("\n=== Órgãos e Seus Tipos ===")
     
@@ -263,6 +268,7 @@ def mostrar_orgaos_tipos():
     
     input("\nPressione Enter para voltar...")
 
+#Função para gerenciar os centros de distribuição
 def gerenciar_centros_distribuicao():
     print("\n=== Centros de Distribuição ===")
     exibir_estoque_centros()
@@ -374,7 +380,7 @@ def buscar_receptor():
 # Menu Principal
 def menu_principal():
     while True:
-        print("\n𝙱𝚎𝚖 𝚟𝚒𝚗𝚍𝚘𝚜 𝚊𝚘 𝚂𝙽𝙳𝙾𝚃 (𝚂𝚒𝚜𝚝𝚎𝚖𝚊 𝙽𝚊𝚌𝚒𝚘𝚗𝚊𝚕 𝚍𝚎 𝙳𝚘𝚊ç𝚊̃𝚘 𝚍𝚎 𝙾𝚛𝚐𝚊̃𝚘𝚜 𝚎 𝚃𝚎𝚌𝚒𝚍𝚘𝚜)!")
+        print("\n𝙱𝚎𝚖 𝚟𝚒𝚗𝚍𝚘 𝚊𝚘 𝚂𝙽𝙳𝙾𝚃 (𝚂𝚒𝚜𝚝𝚎𝚖𝚊 𝙽𝚊𝚌𝚒𝚘𝚗𝚊𝚕 𝚍𝚎 𝚍𝚘𝚊𝚌̧𝚊̃𝚘 𝚍𝚎 𝙾𝚛𝚐𝚊̃𝚘𝚜 𝚎 𝚝𝚎𝚌𝚒𝚍𝚘𝚜)!")
         print('''
               𝟷. Cadastro do Doador
               𝟸. Cadastro do Receptor
@@ -423,10 +429,10 @@ def menu_principal():
             print("Opção inválida. Tente novamente.")
 
 
-# Submenu do Administrador (versão final)
+# Submenu do Administrador
 def submenu_administrador():
     while True:
-        print("\n=== Menu do Administrador ===")
+        print("\n=== 𝙼𝚎𝚗𝚞 𝚍𝚘 𝙰𝚍𝚖𝚒𝚗𝚒𝚜𝚝𝚛𝚊𝚍𝚘𝚛 ===")
         print('''
               1. Login
               2. Logout
