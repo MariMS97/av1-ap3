@@ -45,22 +45,36 @@ def validar_tipo_sanguineo(tipo: str) -> bool:
         return True
     return False
 
-#Validar e gerar ID simples
-def gerar_id_simples(arquivo_json):
-    """Gera um novo ID numérico incremental baseado nos dados existentes"""
-    if not os.path.exists(arquivo_json):
-        return "1"
 
-    with open(arquivo_json, 'r', encoding='utf-8') as f:
-        try:
-            dados = json.load(f)
-            if not dados:
-                return "1"
+def gerar_id_simples(caminho_arquivo):
+    dados_existentes = carregar_dados_json(caminho_arquivo)
+    
+    if not dados_existentes:
+        return 1
+    
+    try:
+        # Obtendo o maior ID existente
+        max_id = max(int(receptor["dados"]["id"]) for receptor in dados_existentes)
+        return max_id + 1
+    except KeyError as e:
+        print(f"Chave não encontrada: {e}")
+        return 1
+    except ValueError:
+        print("Erro de valor ao tentar gerar um novo ID.")
+        return 1
 
-            # Extrai os IDs existentes (como strings) e converte para inteiros
-            ids_existentes = [int(item['dados']['id']) for item in dados if 'dados' in item and 'id' in item['dados']]
-            novo_id = max(ids_existentes) + 1 if ids_existentes else 1
-            return str(novo_id)
+    
 
-        except json.JSONDecodeError:
-            return "1"
+def carregar_dados_json(caminho_arquivo):
+    try:
+        with open(caminho_arquivo, 'r', encoding='utf-8') as arquivo:
+            dados = json.load(arquivo)
+            # Verifica se é uma lista, se não for, inicializa como lista
+            if not isinstance(dados, list):
+                dados = []
+            return dados
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        print(f"Erro ao decodificar o JSON do arquivo {caminho_arquivo}.")
+        return []

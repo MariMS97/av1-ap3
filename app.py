@@ -1,11 +1,14 @@
 
 import json
+import os
 from utils import gerar_id_simples
-from Doador import Doador
-from Receptor import Receptor
-from AdministradorSistema import AdministradorSistema
-from Doacao import Doacao
-from CentroDistribuicao import CentroDistribuicao
+from classes.Doador import Doador
+from classes.Receptor import Receptor
+from classes.AdministradorSistema import AdministradorSistema
+from classes.Doacao import Doacao
+from classes.CentroDistribuicao import CentroDistribuicao
+from classes.IntencaoDoar import IntencaoDoar
+from utils import carregar_dados_json  
 
 
 # Função para carregar dados JSON
@@ -21,9 +24,11 @@ def salvar_dados_json(arquivo, dados):
     with open(arquivo, 'w', encoding='utf-8') as f:
         json.dump(dados, f, indent=4, ensure_ascii=False)
 
-# Cadastro de Doador
+# Função para cadastrar um novo doador
 def cadastro_doador():
-    print("\nCadastro de Doador")
+    print("\n--- Cadastro de Doador ---")
+
+    # Coletando os dados do Doador
     nome = input("Nome: ")
     idade = int(input("Idade: "))
     genero = input("Gênero: ")
@@ -37,41 +42,65 @@ def cadastro_doador():
     estado_civil = input("Estado civil: ")
     contato_emergencia = input("Contato de emergência: ")
     tipo_sanguineo = input("Tipo sanguíneo: ")
-    id_gerado = gerar_id_simples("potenciais_doadores.json") 
+    
+    # Geração de ID único para o doador
+    id_gerado = int(gerar_id_simples(r"jsons\potenciais_doadores.json")) 
 
-    doador_dict = {
-        "dados": {
-            "id": id_gerado,
-            "nome": nome,
-            "idade": idade,
-            "sexo": genero,
-            "data_nascimento": data_nascimento,
-            "cidade_natal": cidade_natal,
-            "estado_natal": estado_natal,
-            "cpf": cpf,
-            "profissao": profissao,
-            "cidade_residencia": cidade_residencia,
-            "estado_residencia": estado_residencia,
-            "estado_civil": estado_civil,
-            "contato_emergencia": contato_emergencia,
-            "tipo_sanguineo": tipo_sanguineo
-        },
-        "intencao": {
-            "status": "s",
-            "orgaos_id": []
-        }
-    }
+    # Coletando dados para a Intenção de Doação
+    status = input("Status da intenção (Pendente/Confirmada/Cancelada): ")
+    data_intencao = input("Data de intenção (DD/MM/AAAA): ")
+    orgaos_id = input("Órgãos para doação (separados por vírgula): ").split(',')
 
-    doadores = carregar_dados_json('potenciais_doadores.json')
-    doadores.append(doador_dict)
-    salvar_dados_json('potenciais_doadores.json', doadores)
-    print("Doador cadastrado com sucesso!")
+    # Removendo espaços desnecessários nos IDs de órgãos
+    orgaos_id = [orgao.strip() for orgao in orgaos_id if orgao.strip()]
 
-# Cadastro de Receptor
+    # Criação do objeto IntencaoDoar
+    intencao = IntencaoDoar(data_intencao=data_intencao, status=status, orgaos_id=orgaos_id)
+
+    # Criação do objeto Doador com a Intenção de Doar
+    doador = Doador(
+        id=id_gerado,
+        nome=nome,
+        idade=idade,
+        genero=genero,
+        data_nascimento=data_nascimento,
+        cidade_natal=cidade_natal,
+        estado_natal=estado_natal,
+        cpf=cpf,
+        profissao=profissao,
+        cidade_residencia=cidade_residencia,
+        estado_residencia=estado_residencia,
+        estado_civil=estado_civil,
+        contato_emergencia=contato_emergencia,
+        tipo_sanguineo=tipo_sanguineo,
+        intencao_doar=intencao
+    )
+
+    # Cadastra no dicionário da classe
+    try:
+        doador.cadastrar()
+        print("Doador cadastrado com sucesso!")
+    except ValueError as e:
+        print(f"Erro ao cadastrar doador: {e}")
+        return
+
+    # Atualiza o arquivo JSON no formato correto
+    doadores = carregar_dados_json(r'jsons\potenciais_doadores.json')
+    doadores.append({
+        "dados": doador.to_dict(),
+        "intencao": intencao.to_dict()
+    })
+    salvar_dados_json(r'jsons\potenciais_doadores.json', doadores)
+
+# Função para cadastrar um novo receptor
 def cadastro_receptor():
     print("\nCadastro de Receptor")
-
+    
+    # Caminho do arquivo JSON
+    caminho_arquivo = r'jsons\receptores.json'
+    
     # Dados pessoais
+    id_receptor = int(gerar_id_simples(caminho_arquivo)) 
     nome = input("Nome: ")
     idade = int(input("Idade: "))
     genero = input("Gênero (M/F/O): ")
@@ -91,53 +120,53 @@ def cadastro_receptor():
     centro_transplante = input("Centro de transplante vinculado: ")
     posicao_lista_espera = input("Posição na lista de espera: ")
 
-    receptores = carregar_dados_json('receptores.json')
-    id_receptor = gerar_id_simples("receptores.json")
+    # Instanciando o objeto Receptor
+    novo_receptor = Receptor(
+        id=id_receptor,
+        nome=nome,
+        idade=idade,
+        genero=genero,
+        data_nascimento=data_nascimento,
+        cidade_natal=cidade_natal,
+        estado_natal=estado_natal,
+        cpf=cpf,
+        profissao=profissao,
+        cidade_residencia=cidade_residencia,
+        estado_residencia=estado_residencia,
+        estado_civil=estado_civil,
+        orgao_necessario=orgao_necessario,
+        gravidade_condicao=gravidade_condicao,
+        centro_transplante_vinculado=centro_transplante,
+        contato_emergencia=contato_emergencia,
+        posicao_lista_espera=posicao_lista_espera
+    )
 
-    novo_receptor = {
-        "id": id_receptor,
-        "dados": {
-            "id": id_receptor,
-            "nome": nome,
-            "idade": idade,
-            "sexo": genero,
-            "data_nascimento": data_nascimento,
-            "cidade_natal": cidade_natal,
-            "estado_natal": estado_natal,
-            "cpf": cpf,
-            "profissao": profissao,
-            "cidade_residencia": cidade_residencia,
-            "estado_residencia": estado_residencia,
-            "estado_civil": estado_civil,
-            "contato_emergencia": contato_emergencia,
-        },
-        "necessidade": {
-            "orgao_necessario": orgao_necessario,
-            "gravidade_condicao": gravidade_condicao,
-            "centro_transplante": centro_transplante,
-            "posicao_lista_espera": posicao_lista_espera
-        }
-    }
+    try:
+        # Chamando o método cadastrar do objeto
+        novo_receptor.cadastrar()
+        print("Receptor cadastrado com sucesso!")
+    except ValueError as ve:
+        print(f"Erro de validação: {ve}")
+    except Exception as e:
+        print(f"Erro ao cadastrar receptor: {e}")
 
-    receptores.append(novo_receptor)
-    salvar_dados_json('receptores.json', receptores)
 
-    print("Receptor cadastrado com sucesso!")
 
 # Função para cadastrar um novo administrador
 def cadastro_administrador():
-    administradores = carregar_dados_json('admins.json')
+    """Função para cadastrar um novo administrador no sistema."""
+    administradores = carregar_dados_json(r'jsons\admins.json')
+    
     try:
         print("\n--- Cadastro de Administrador ---")
         
         # Gerando um ID único para o novo administrador
-        novo_id = gerar_id_simples('admins.json')
+        novo_id = gerar_id_simples(r'jsons\admins.json')
 
         # Entrando com os dados de acesso
         nome_usuario = input("Nome de usuário: ").strip()
         
         # Verifica se o nome de usuário já está em uso
-        administradores = AdministradorSistema.carregar_dados()
         if any(admin["acesso"]["nome_usuario"] == nome_usuario for admin in administradores):
             print(f"Erro: o nome de usuário '{nome_usuario}' já está em uso.")
             return
@@ -195,8 +224,8 @@ def cadastro_administrador():
         # Chama o método de cadastro do administrador
         resultado = admin.cadastrar()
 
-        salvar_dados_json('admins.json', administradores)
-       
+        # Salva os dados no JSON
+        salvar_dados_json(r'jsons\admins.json', administradores)
 
         # Exibe mensagem de sucesso
         print(f"\n{resultado}")
@@ -211,7 +240,7 @@ def login_administrador():
     nome_usuario = input("Digite o nome de usuário: ").strip()
     senha = input("Digite a senha: ").strip()
     
-    administradores = carregar_dados_json('admins.json')
+    administradores = carregar_dados_json(r'jsons\admins.json')
     for admin in administradores:
         if admin['acesso']['nome_usuario'] == nome_usuario and admin['acesso']['senha'] == senha:
             print("Login bem-sucedido!")
@@ -253,7 +282,7 @@ def mostrar_orgaos_tipos():
     print("\n=== Órgãos e Seus Tipos ===")
     
     try:
-        dados = carregar_dados_json('orgãos_tipos.json')
+        dados = carregar_dados_json(r'jsons\orgãos_tipos.json')
         if dados:
             # Verifica se as listas têm o mesmo tamanho
             if len(dados['orgaos']) == len(dados['tipos_de_orgaos']):
@@ -274,23 +303,23 @@ def gerenciar_centros_distribuicao():
     exibir_estoque_centros()
     input("\nPressione Enter para voltar...")
 
-# Adicionar Doação
 def adicionar_doacao():
     print("\nAdicionar Doação")
     tipo_doacao = input("Tipo de doação: ")
-    id_doador = input("ID do doador: ")
-    id_receptor = input("ID do receptor: ")
+    id_doador = int(input("ID do doador: "))  # Convertendo para inteiro
+    id_receptor = int(input("ID do receptor: "))  # Convertendo para inteiro
+    status = input("Status da doação (Realizada/Pendente/Cancelada): ")
 
     doacao = Doacao(tipo_doacao, id_doador, id_receptor)
-    doacoes = carregar_dados_json('doacoes.json')
+    doacoes = carregar_dados_json(r'jsons\doacoes.json')
     doacoes.append(doacao.to_dict())
 
-    salvar_dados_json('doacoes.json', doacoes)
+    salvar_dados_json(r'jsons\doacoes.json', doacoes)
     print("Doação registrada com sucesso!")
 
 # Exibir Estoque dos Centros
 def exibir_estoque_centros():
-    centros = CentroDistribuicao.carregar_centros_de_json("centros_distribuicao.json")
+    centros = CentroDistribuicao.carregar_centros_de_json(r"jsons\centros_distribuicao.json")
     if centros:
         print("\n=== Estoque Atual dos Centros de Distribuição ===")
         for centro in centros:
@@ -301,7 +330,7 @@ def exibir_estoque_centros():
 # Exibir Histórico de Doações
 def exibir_historico_doacoes():
     print("\nHistórico de Doações")
-    doacoes = carregar_dados_json('doacoes.json')
+    doacoes = carregar_dados_json(r'jsons\doacoes.json')
     if doacoes:
         for d in doacoes:
             print(f"ID: {d['id']} | Doador: {d['id_doador']} | Receptor: {d['id_receptor']} | Tipo: {d['tipo_doacao']}")
@@ -311,18 +340,30 @@ def exibir_historico_doacoes():
 # Listar Doadores
 def listar_doadores():
     print("\nLista de Doadores")
-    doadores = carregar_dados_json('potenciais_doadores.json')
+    doadores = carregar_dados_json(r'jsons\potenciais_doadores.json')
+    
     if doadores:
         for doador in doadores:
-            dados = doador["dados"]
-            print(f"ID: {dados['id']} | Nome: {dados['nome']} | CPF: {dados['cpf']}")
+            dados = doador.get("dados", {})
+            print(f"ID: {dados.get('id')} | Nome: {dados.get('nome')} | CPF: {dados.get('cpf')}")
+
+            # Verifica se existe uma intenção de doar
+            intencao = doador.get("intencao", {})
+            if "data_intencao" in intencao and "status" in intencao:
+                print(f"Data de Intenção: {intencao['data_intencao']} | Status: {intencao['status']}")
+            else:
+                print("Intenção de doar não encontrada ou incompleta.")
+                
+            print("-" * 40)
     else:
         print("Nenhum doador cadastrado.")
+
+
 
 # Listar Receptores
 def listar_receptores():
     print("\nLista de Receptores")
-    receptores = carregar_dados_json('receptores.json')
+    receptores = carregar_dados_json(r'jsons\receptores.json')
     if receptores:
         for receptor in receptores:
             dados = receptor["dados"]
@@ -333,12 +374,12 @@ def listar_receptores():
 # Editar Doador
 def editar_doador():
     doador_id = int(input("Digite o ID do doador a ser editado: "))
-    doadores = carregar_dados_json('potenciais_doadores.json')
+    doadores = carregar_dados_json(r'jsons\potenciais_doadores.json')
     doador = next((d for d in doadores if d["dados"]["id"] == doador_id), None)
     if doador:
         nome = input(f"Nome ({doador['dados']['nome']}): ") or doador['dados']['nome']
         doador['dados']['nome'] = nome
-        salvar_dados_json('potenciais_doadores.json', doadores)
+        salvar_dados_json(r'jsons\potenciais_doadores.json', doadores)
         print("Doador editado com sucesso!")
     else:
         print("Doador não encontrado.")
@@ -346,12 +387,12 @@ def editar_doador():
 # Editar Receptor
 def editar_receptor():
     receptor_id = int(input("Digite o ID do receptor a ser editado: "))
-    receptores = carregar_dados_json('receptores.json')
+    receptores = carregar_dados_json(r'jsons\receptores.json')
     receptor = next((r for r in receptores if r["id"] == receptor_id), None)
     if receptor:
         nome = input(f"Nome ({receptor['dados']['nome']}): ") or receptor['dados']['nome']
         receptor['dados']['nome'] = nome
-        salvar_dados_json('receptores.json', receptores)
+        salvar_dados_json(r'jsons\receptores.json', receptores)
         print("Receptor editado com sucesso!")
     else:
         print("Receptor não encontrado.")
@@ -359,7 +400,7 @@ def editar_receptor():
 # Buscar Doador
 def buscar_doador():
     doador_id = input("Digite o ID ou CPF do doador: ")
-    doadores = carregar_dados_json('potenciais_doadores.json')
+    doadores = carregar_dados_json(r'jsons\potenciais_doadores.json')
     doador = next((d for d in doadores if str(d['dados']['id']) == doador_id or d['dados']['cpf'] == doador_id), None)
     if doador:
         print(f"ID: {doador['dados']['id']} | Nome: {doador['dados']['nome']} | CPF: {doador['dados']['cpf']}")
@@ -369,7 +410,7 @@ def buscar_doador():
 # Buscar Receptor
 def buscar_receptor():
     receptor_id = input("Digite o ID ou CPF do receptor: ")
-    receptores = carregar_dados_json('receptores.json')
+    receptores = carregar_dados_json(r'jsons\receptores.json')
     receptor = next((r for r in receptores if str(r['dados']['id']) == receptor_id or r['dados']['cpf'] == receptor_id), None)
     if receptor:
         print(f"ID: {receptor['dados']['id']} | Nome: {receptor['dados']['nome']} | Órgão Necessário: {receptor['necessidade']['orgao_necessario']}")
