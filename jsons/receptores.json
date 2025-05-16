@@ -1,20 +1,20 @@
 {
     "dados": {
         "id": 1,
-        "nome": "Jo\u00e3o Ferreira da Silva",
+        "nome": "Joao Ferreira da Silva",
         "idade": 90,
         "genero": "M",
         "data_nascimento": "01/04/1935",
-        "cidade_natal": "S\u00e3o Franscisco de Goias",
+        "cidade_natal": "Sao Franscisco de Goias",
         "estado_natal": "GO",
         "cpf": "33165499878",
         "profissao": "Fazendeiro",
-        "cidade_residencia": "An\u00e1polis",
+        "cidade_residencia": "Anapolis",
         "estado_residencia": "GO",
         "estado_civil": "Casado",
-        "orgao_necessario": "Pulm\u00f5es",
+        "orgao_necessario": "Pulmoes",
         "gravidade_condicao": "Grave",
-        "centro_transplante_vinculado": "Bras\u00edlia",
+        "centro_transplante_vinculado": "Brasilia",
         "contato_emergencia": "62999685452",
         "posicao_lista_espera": "4"
     }

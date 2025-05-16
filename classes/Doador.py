@@ -45,7 +45,7 @@ class Doador(Pessoa):
             raise ValueError(f"Tipo sanguíneo inválido: {valor}")  # Erro se o valor não for válido
         self.__tipo_sanguineo = valor
 
-    # Método para cadastrar um doador
+    # Método para cadastrar um doador (somente no dicionário interno)
     def cadastrar(self):
         if self._id in Doador._doadores:
             raise ValueError("Doador já cadastrado com este ID.")  # Erro se já existir um doador com o mesmo ID
@@ -75,13 +75,13 @@ class Doador(Pessoa):
                     return doador
         return None  # Retorna None se não encontrar o doador
 
-    # Método de classe para carregar doadores a partir de um arquivo JSON
+    # Método de classe para carregar doadores a partir de um arquivo JSON (somente para o dicionário interno)
     @classmethod
     def carregar_de_json(cls, arquivo='jsons\\doacoes.json'):
         try:
             with open(arquivo, 'r') as f:  # Abre o arquivo JSON
                 dados = json.load(f)  # Carrega os dados JSON
-            # Para cada item no JSON, cria um objeto Doador e o cadastra
+            # Para cada item no JSON, cria um objeto Doador e o cadastra SOMENTE no dicionário
             for item in dados:
                 doador = cls(
                     id=item['id'],
@@ -100,7 +100,7 @@ class Doador(Pessoa):
                     tipo_sanguineo=item['tipo_sanguineo'],
                     intencao_doar=item.get('intencao_doar', None)  # Busca a intenção de doar
                 )
-                doador.cadastrar()  # Registra o doador no dicionário
+                Doador._doadores[doador.id] = doador  # Apenas cadastra no dicionário
             return True
         except Exception as e:
             print(f"Erro ao carregar doadores: {e}")  # Exibe erro caso ocorra
