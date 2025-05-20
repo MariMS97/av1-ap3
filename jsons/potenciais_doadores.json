@@ -17,8 +17,8 @@
             "tipo_sanguineo": "A-"
         },
         "intencao": {
-            "status": "n",
-            "orgaos_id": []
+            "status": "Pendente",
+            "orgaos_id": ["Fígado"]
         }
     },
     {
@@ -39,7 +39,7 @@
             "tipo_sanguineo": "AB-"
         },
         "intencao": {
-            "status": "s",
+            "status": "Confirmada",
             "orgaos_id": []
         }
     },
@@ -61,7 +61,7 @@
             "tipo_sanguineo": "AB-"
         },
         "intencao": {
-            "status": "s",
+            "status": "Confirmada",
             "orgaos_id": []
         }
     },
@@ -83,7 +83,7 @@
             "tipo_sanguineo": "A+"
         },
         "intencao": {
-            "status": "n",
+            "status": "Pendente",
             "orgaos_id": []
         }
     },
@@ -105,7 +105,7 @@
             "tipo_sanguineo": "A-"
         },
         "intencao": {
-            "status": "s",
+            "status": "Confirmada",
             "orgaos_id": []
         }
     },
@@ -127,7 +127,7 @@
             "tipo_sanguineo": "A+"
         },
         "intencao": {
-            "status": "s",
+            "status": "Confirmada",
             "orgaos_id": []
         }
     },
@@ -149,7 +149,7 @@
             "tipo_sanguineo": "B-"
         },
         "intencao": {
-            "status": "s",
+            "status": "Confirmada",
             "orgaos_id": []
         }
     },
@@ -171,7 +171,7 @@
             "tipo_sanguineo": "A+"
         },
         "intencao": {
-            "status": "n",
+            "status": "Pendente",
             "orgaos_id": []
         }
     },
@@ -193,7 +193,7 @@
             "tipo_sanguineo": "AB-"
         },
         "intencao": {
-            "status": "n",
+            "status": "Pendente",
             "orgaos_id": []
         }
     },
@@ -215,29 +215,7 @@
             "tipo_sanguineo": "B-"
         },
         "intencao": {
-            "status": "s",
-            "orgaos_id": []
-        }
-    },
-    {
-        "dados": {
-            "id": 1,
-            "nome": "Mariana Magalhães",
-            "idade": 27,
-            "sexo": "F",
-            "data_nascimento": "25/10/1997",
-            "cidade_natal": "Anápolis",
-            "estado_natal": "GO",
-            "cpf": "25896314765",
-            "profissao": "Estudante",
-            "cidade_residencia": "Brasília",
-            "estado_residencia": "DF",
-            "estado_civil": "Solteira",
-            "contato_emergencia": "61999678142",
-            "tipo_sanguineo": "O+"
-        },
-        "intencao": {
-            "status": "s",
+            "status": "Confirmada",
             "orgaos_id": []
         }
     },
@@ -259,26 +237,9 @@
             "tipo_sanguineo": "O+"
         },
         "intencao": {
-            "status": "s",
+            "status": "Confirmada",
             "orgaos_id": []
         }
-    },
-    {
-        "id": 12,
-        "nome": "Mariana",
-        "idade": 27,
-        "genero": "F",
-        "data_nascimento": "25/10/1997",
-        "cidade_natal": "Anápolis",
-        "estado_natal": "GO",
-        "cpf": "65498732132",
-        "profissao": "Estudante",
-        "cidade_residencia": "Brasília ",
-        "estado_residencia": "DF",
-        "estado_civil": "Solteira",
-        "contato_emergencia": "987543265",
-        "tipo_sanguineo": "O+",
-        "orgaos_disponiveis": []
     },
     {
         "dados": {
@@ -296,11 +257,7 @@
             "estado_civil": "Solteira",
             "contato_emergencia": "61999845236",
             "tipo_sanguineo": "O+",
-            "orgaos_disponiveis": [],
-            "intencao_doar": {
-                "data_intencao": "08/05/2025",
-                "status": "Confirmada"
-            }
+            "orgaos_disponiveis": []
         },
         "intencao": {
             "data_intencao": "08/05/2025",

@@ -1,131 +1,93 @@
-# Importação da classe Pessoa (classe base da qual Doador herda)
 from classes.Pessoa import Pessoa
-# Importação do módulo json para manipulação de dados JSON
-import json
 from classes.IntencaoDoar import IntencaoDoar
+import json
 
-# Classe Doador, herda de Pessoa
 class Doador(Pessoa):
-    # Dicionário para armazenar os doadores, sendo a chave o ID do doador
-    _doadores = {}
+    doadores = {}
 
-    # Construtor da classe Doador, inicializa os atributos da classe
     def __init__(self, id: int, nome: str, idade: int, genero: str, data_nascimento: str,
                  cidade_natal: str, estado_natal: str, cpf: str, profissao: str,
                  cidade_residencia: str, estado_residencia: str, estado_civil: str,
                  contato_emergencia: str, tipo_sanguineo: str, intencao_doar=None):
-        # Chama o construtor da classe base (Pessoa) para inicializar os atributos comuns
-        super().__init__(id, nome, idade, genero, data_nascimento, cidade_natal,
-                         estado_natal, cpf, profissao, cidade_residencia,
-                         estado_residencia, estado_civil)
-        # Atribui o contato de emergência e tipo sanguíneo, além de inicializar lista de órgãos disponíveis
+        super().__init__(id, nome, idade, genero, data_nascimento, cidade_natal, estado_natal,
+                         cpf, profissao, cidade_residencia, estado_residencia, estado_civil)
         self.contato_emergencia = contato_emergencia
         self.tipo_sanguineo = tipo_sanguineo
-        self._orgaos_disponiveis = []  # Lista de órgãos disponíveis para doação
-        
-        # Inicialização da intenção de doar
+        self._orgaos_disponiveis = []
+
         if isinstance(intencao_doar, IntencaoDoar):
             self.intencao_doar = intencao_doar
         elif isinstance(intencao_doar, dict):
             self.intencao_doar = IntencaoDoar(**intencao_doar)
         else:
-            # Valor padrão se não for passado
-            self.intencao_doar = IntencaoDoar(data_intencao="01/01/2025", status="Pendente")
+            self.intencao_doar = None
 
-    # Propriedade para tipo sanguíneo com validação dos tipos possíveis
     @property
     def tipo_sanguineo(self):
         return self.__tipo_sanguineo
 
     @tipo_sanguineo.setter
     def tipo_sanguineo(self, valor):
-        # Tipos sanguíneos válidos
-        tipos_validos = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
-        if valor not in tipos_validos:
-            raise ValueError(f"Tipo sanguíneo inválido: {valor}")  # Erro se o valor não for válido
+        tipos = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
+        if valor not in tipos:
+            raise ValueError("Tipo sanguíneo inválido.")
         self.__tipo_sanguineo = valor
 
-    # Método para cadastrar um doador (somente no dicionário interno)
     def cadastrar(self):
-        if self._id in Doador._doadores:
-            raise ValueError("Doador já cadastrado com este ID.")  # Erro se já existir um doador com o mesmo ID
-        Doador._doadores[self._id] = self  # Adiciona o doador ao dicionário
+        if self._id in Doador.doadores:
+            raise ValueError("Doador já cadastrado.")
+        Doador.doadores[self._id] = self
         return True
 
-    # Método de classe para listar todos os doadores cadastrados
     @classmethod
     def listar(cls):
-        return cls._doadores  # Retorna o dicionário de doadores
+        return cls.doadores
 
-    # Método para editar os dados do doador, passando novos valores através de kwargs
     def editar(self, **kwargs):
         for key, value in kwargs.items():
-            if hasattr(self, key):  # Verifica se o atributo existe
-                setattr(self, key, value)  # Atribui o novo valor
+            if hasattr(self, key):
+                setattr(self, key, value)
         return True
 
-    # Método de classe para buscar doadores por ID ou CPF
     @classmethod
     def buscar(cls, identificador):
         if isinstance(identificador, int):
-            return cls._doadores.get(identificador)  # Busca por ID
+            return cls.doadores.get(identificador)
         elif isinstance(identificador, str):
-            for doador in cls._doadores.values():
-                if doador.cpf == identificador:  # Busca por CPF
-                    return doador
-        return None  # Retorna None se não encontrar o doador
+            for d in cls.doadores.values():
+                if d.cpf == identificador:
+                    return d
+        return None
 
-    # Método de classe para carregar doadores a partir de um arquivo JSON (somente para o dicionário interno)
     @classmethod
-    def carregar_de_json(cls, arquivo='jsons\\doacoes.json'):
+    def carregar_de_json(cls, caminho='jsons/doacoes.json'):
         try:
-            with open(arquivo, 'r') as f:  # Abre o arquivo JSON
-                dados = json.load(f)  # Carrega os dados JSON
-            # Para cada item no JSON, cria um objeto Doador e o cadastra SOMENTE no dicionário
+            with open(caminho, 'r', encoding='utf-8') as f:
+                dados = json.load(f)
+
             for item in dados:
+                dados_doador = item['dados']
+                intencao = item.get('intencao', None)
+
                 doador = cls(
-                    id=item['id'],
-                    nome=item['nome'],
-                    idade=item['idade'],
-                    genero=item['genero'],
-                    data_nascimento=item['data_nascimento'],
-                    cidade_natal=item['cidade_natal'],
-                    estado_natal=item['estado_natal'],
-                    cpf=item['cpf'],
-                    profissao=item['profissao'],
-                    cidade_residencia=item['cidade_residencia'],
-                    estado_residencia=item['estado_residencia'],
-                    estado_civil=item['estado_civil'],
-                    contato_emergencia=item['contato_emergencia'],
-                    tipo_sanguineo=item['tipo_sanguineo'],
-                    intencao_doar=item.get('intencao_doar', None)  # Busca a intenção de doar
+                    id=dados_doador['id'],
+                    nome=dados_doador['nome'],
+                    idade=dados_doador['idade'],
+                    genero=dados_doador['genero'],
+                    data_nascimento=dados_doador['data_nascimento'],
+                    cidade_natal=dados_doador['cidade_natal'],
+                    estado_natal=dados_doador['estado_natal'],
+                    cpf=dados_doador['cpf'],
+                    profissao=dados_doador['profissao'],
+                    cidade_residencia=dados_doador['cidade_residencia'],
+                    estado_residencia=dados_doador['estado_residencia'],
+                    estado_civil=dados_doador['estado_civil'],
+                    contato_emergencia=dados_doador['contato_emergencia'],
+                    tipo_sanguineo=dados_doador['tipo_sanguineo'],
+                    intencao_doar=intencao
                 )
-                Doador._doadores[doador.id] = doador  # Apenas cadastra no dicionário
+                cls.doadores[doador.id] = doador
             return True
         except Exception as e:
-            print(f"Erro ao carregar doadores: {e}")  # Exibe erro caso ocorra
+            print(f"Erro ao carregar: {e}")
             return False
-
-    # Método para converter o objeto Doador em um dicionário
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'nome': self.nome,
-            'idade': self.idade,
-            'genero': self.genero,
-            'data_nascimento': self.data_nascimento,
-            'cidade_natal': self.cidade_natal,
-            'estado_natal': self.estado_natal,
-            'cpf': self.cpf,
-            'profissao': self.profissao,
-            'cidade_residencia': self.cidade_residencia,
-            'estado_residencia': self.estado_residencia,
-            'estado_civil': self.estado_civil,
-            'contato_emergencia': self.contato_emergencia,
-            'tipo_sanguineo': self.tipo_sanguineo,
-            'orgaos_disponiveis': self._orgaos_disponiveis,
-            'intencao_doar': {
-                'data_intencao': self.intencao_doar.data_intencao,
-                'status': self.intencao_doar.status
-            }
-        }

@@ -1,16 +1,10 @@
-# Importação de recursos para criar uma classe abstrata
 from abc import ABC, abstractmethod
-
-# Importação da classe datetime para validação de data de nascimento
 from datetime import datetime
 
-# Classe base abstrata Pessoa
 class Pessoa(ABC):
-    # Método construtor que inicializa todos os atributos da pessoa
     def __init__(self, id: int, nome: str, idade: int, genero: str, data_nascimento: str,
                  cidade_natal: str, estado_natal: str, cpf: str, profissao: str,
                  cidade_residencia: str, estado_residencia: str, estado_civil: str):
-        # Atribuições usando os setters para garantir validação
         self.id = id
         self.nome = nome
         self.idade = idade
@@ -24,7 +18,6 @@ class Pessoa(ABC):
         self.estado_residencia = estado_residencia
         self.estado_civil = estado_civil
 
-    # Propriedade id com validação: deve ser inteiro positivo
     @property
     def id(self):
         return self._id
@@ -35,7 +28,6 @@ class Pessoa(ABC):
             raise ValueError("ID deve ser um número inteiro positivo.")
         self._id = valor
 
-    # Propriedade nome com validação: não pode ser vazio
     @property
     def nome(self):
         return self.__nome
@@ -46,7 +38,6 @@ class Pessoa(ABC):
             raise ValueError("Nome não pode ser vazio.")
         self.__nome = valor.strip()
 
-    # Propriedade idade com validação: deve estar entre 0 e 120
     @property
     def idade(self):
         return self.__idade
@@ -54,10 +45,9 @@ class Pessoa(ABC):
     @idade.setter
     def idade(self, valor):
         if not isinstance(valor, int) or not (0 <= valor <= 120):
-            raise ValueError("Idade deve ser um número entre 0 e 120.")
+            raise ValueError("Idade inválida.")
         self.__idade = valor
 
-    # Propriedade genero com validação: deve ser M, F ou O
     @property
     def genero(self):
         return self.__genero
@@ -65,10 +55,9 @@ class Pessoa(ABC):
     @genero.setter
     def genero(self, valor):
         if valor not in ['M', 'F', 'O']:
-            raise ValueError("Gênero deve ser 'M', 'F' ou 'O'.")
+            raise ValueError("Gênero inválido.")
         self.__genero = valor
 
-    # Propriedade data_nascimento com validação de formato DD/MM/AAAA
     @property
     def data_nascimento(self):
         return self.__data_nascimento
@@ -76,22 +65,22 @@ class Pessoa(ABC):
     @data_nascimento.setter
     def data_nascimento(self, valor):
         try:
-            datetime.strptime(valor, "%d/%m/%Y")  # Valida o formato da data
+            datetime.strptime(valor, "%d/%m/%Y")
             self.__data_nascimento = valor
         except ValueError:
-            raise ValueError("Data de nascimento deve estar no formato DD/MM/AAAA.")
-        
+            raise ValueError("Data de nascimento inválida (DD/MM/AAAA).")
+
     @property
     def estado_civil(self):
         return self.__estado_civil
-    
+
     @estado_civil.setter
     def estado_civil(self, valor):
-        if valor not in ['Solteiro', 'Casado', 'Divorciado', 'Viúvo', 'Solteira', 'Casada', 'Divorciada', 'Viúva']:
-            raise ValueError("Estado civil deve ser 'Solteiro', 'Casado', 'Divorciado', 'Viúvo', 'Solteira', 'Casada', 'Divorciada', 'Viúva.")
+        opcoes = ['Solteiro', 'Solteira', 'Casado', 'Casada', 'Divorciado', 'Divorciada', 'Viúvo', 'Viúva']
+        if valor not in opcoes:
+            raise ValueError("Estado civil inválido.")
         self.__estado_civil = valor
 
-    # Propriedade cpf com validação: deve ter 11 dígitos numéricos
     @property
     def cpf(self):
         return self.__cpf
@@ -99,28 +88,17 @@ class Pessoa(ABC):
     @cpf.setter
     def cpf(self, valor):
         if not isinstance(valor, str) or len(valor) != 11 or not valor.isdigit():
-            raise ValueError("CPF deve conter exatamente 11 dígitos numéricos.")
+            raise ValueError("CPF inválido.")
         self.__cpf = valor
 
-    # Métodos abstratos que devem ser implementados pelas subclasses
     @abstractmethod
-    def cadastrar(self):
-        pass
+    def cadastrar(self): pass
 
     @abstractmethod
-    def listar(self):
-        pass
+    def listar(self): pass
 
     @abstractmethod
-    def editar(self, **kwargs):
-        pass
+    def editar(self, **kwargs): pass
 
     @abstractmethod
-    def buscar(self, identificador):
-        pass
-
-    # Método especial para representar o objeto como string
-    def __str__(self):
-        return f"{self.__class__.__name__}: {self.nome} (ID: {self.__id}, CPF: {self.cpf})"
-
-    
+    def buscar(self, identificador): pass

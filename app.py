@@ -7,7 +7,8 @@ from classes.Doacao import Doacao
 from classes.CentroDistribuicao import CentroDistribuicao
 from classes.IntencaoDoar import IntencaoDoar
 from utils import carregar_dados_json  
-
+import json
+import os
 
 # Função para cadastrar um novo doador
 def cadastro_doador():
@@ -29,7 +30,7 @@ def cadastro_doador():
     tipo_sanguineo = input("Tipo sanguíneo: ")
     
     # Geração de ID único para o doador (caso não exista um método, podemos criar um)
-    id_gerado = max(Doador._doadores.keys(), default=0) + 1
+    id_gerado = max(Doador.doadores.keys(), default=0) + 1
 
     # Coletando dados para a Intenção de Doação
     status = input("Status da intenção (Pendente/Confirmada/Cancelada): ")
@@ -40,7 +41,7 @@ def cadastro_doador():
     orgaos_id = [orgao.strip() for orgao in orgaos_id if orgao.strip()]
 
     # Criação do objeto IntencaoDoar
-    intencao = IntencaoDoar(data_intencao=data_intencao, status=status, orgaos_id=orgaos_id)
+    intencao = IntencaoDoar(data_intencao=data_intencao, status=status)
 
     # Criação do objeto Doador com a Intenção de Doar
     doador = Doador(
@@ -74,9 +75,9 @@ def cadastro_receptor():
         print("\n--- Cadastro de Receptor ---")
 
         # Geração de ID automático
-        if Receptor._receptores:
+        if Receptor.receptores:
             # Pega o maior ID existente no dicionário e adiciona 1
-            novo_id = max(Receptor._receptores.keys()) + 1
+            novo_id = max(Receptor.receptores.keys()) + 1
         else:
             novo_id = 1  # Caso o dicionário esteja vazio, começa pelo ID 1
         
@@ -96,6 +97,7 @@ def cadastro_receptor():
         estado_civil = input("Estado civil: ")
 
         # Campos específicos do receptor
+        tipo_sanguineo = input("Tipo sanguíneo: ")  # Não é necessário para receptor
         orgao_necessario = input("Órgão necessário: ")
         gravidade_condicao = input("Gravidade da condição: ")
         centro_transplante_vinculado = input("Centro de transplante vinculado: ")
@@ -116,6 +118,7 @@ def cadastro_receptor():
             cidade_residencia=cidade_residencia,
             estado_residencia=estado_residencia,
             estado_civil=estado_civil,
+            tipo_sanguineo=tipo_sanguineo,  # Não é necessário para receptor
             orgao_necessario=orgao_necessario,
             gravidade_condicao=gravidade_condicao,
             centro_transplante_vinculado=centro_transplante_vinculado,
@@ -298,26 +301,24 @@ def gerenciar_centros_distribuicao():
     input("\nPressione Enter para voltar...")
 ""
 
-
+# Função para adicionar uma doação
 def adicionar_doacao():
     print("\n=== Adicionar Doação ===")
-    tipo_doacao = input("Tipo de doação: ")
+    tipo_doacao = input("Tipo de doação: ").strip()
     
     try:
-        id_doador = int(input("ID do doador: "))
-        id_receptor = int(input("ID do receptor: "))
+        id_doador = int(input("ID do doador: ").strip())
+        id_receptor = int(input("ID do receptor: ").strip())
     except ValueError:
         print("IDs devem ser números inteiros.")
         return
 
-    status = input("Status da doação (Realizada/Pendente/Cancelada): ")
+    status = input("Status da doação (Realizada/Pendente/Cancelada): ").strip().capitalize()
 
     try:
-        # Cria uma nova instância de Doacao e registra automaticamente no dicionário interno
-        Doacao(tipo_doacao, id_doador, id_receptor, status)
-        print("Doação registrada com sucesso!")
+        nova_doacao = Doacao(tipo_doacao, id_doador, id_receptor, status)
     except ValueError as e:
-        print(f"Erro ao registrar doação: {e}")
+        print(f"\nErro ao registrar doação: {e}")
 
 
 # Exibir Estoque dos Centros
@@ -340,31 +341,43 @@ def exibir_historico_doacoes():
     else:
         print("Nenhuma doação registrada.")
 
-# Listar Doadores
-def listar_doadores():
-    print("\n--- Lista de Doadores ---")
-    doadores = Doador.listar()
-    
-    if doadores:
-        for doador in doadores.values():
-            print(f"ID: {doador.id} | Nome: {doador.nome} | CPF: {doador.cpf}")
-            
-            # Verifica se existe uma intenção de doar
-            if doador.intencao_doar:
-                print(f"Data de Intenção: {doador.intencao_doar.data_intencao} | Status: {doador.intencao_doar.status}")
-            else:
-                print("Intenção de doar não encontrada ou incompleta.")
-            
-            print("-" * 40)
-    else:
-        print("Nenhum doador cadastrado.")
+# Função carregar_json (silenciosa)
+def carregar_json():
+    caminho = os.path.join("jsons", "potenciais_doadores.json")
+    if os.path.exists(caminho):
+        Doador.carregar_de_json(caminho) 
 
+def listar_doadores():
+    print("\n--- LISTA DE DOADORES ---")
+    doadores = Doador.listar()  # Pega do Doador.doadores
+    
+    if not doadores:
+        print("Nenhum doador cadastrado.")
+        return
+    
+    for id, doador in doadores.items():
+        print(f"\nID: {id}")
+        print(f"Nome: {doador.nome}")
+        print(f"CPF: {doador.cpf}")
+        print(f"Tipo Sanguíneo: {doador.tipo_sanguineo}")
+        
+        if doador.intencao_doar:
+            print(f"Data da Intenção: {doador.intencao_doar.data_intencao}")
+            print(f"Status: {doador.intencao_doar.status}")
+        else:
+            print("Sem intenção de doação registrada.")
 
 # Listar Receptores
 def listar_receptores():
     print("\n--- Lista de Receptores ---")
+     # Caminho do arquivo JSON (ajuste conforme necessário)
+    caminho_arquivo = "jsons/receptores.json"
+
     receptores = Receptor.listar()
-    
+
+     # Lê os dados do JSON
+    with open(caminho_arquivo, "r", encoding="utf-8") as f:
+        doadores = json.load(f)
     if receptores:
         for receptor in receptores.values():
             print(f"ID: {receptor.id} | Nome: {receptor.nome} | Órgão Necessário: {receptor.orgao_necessario}")

@@ -4,7 +4,7 @@ import json
 class AdministradorSistema(Pessoa):
     ARQUIVO_ADMINISTRADORES = "administradores.json"  # caminho do JSON
 
-    administradores = []  # dicionário interno, estático para todos os objetos
+    administradores = {}  # dicionário interno, estático para todos os objetos
 
     @classmethod
     def carregar_dados(cls):
