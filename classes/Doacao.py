@@ -72,7 +72,7 @@ class Doacao:
         self.__status = valor
 
     # ----------------------------------------
-    # Chain of Responsibility INTERNAMENTE
+    # Chain of Responsibility 
     # ----------------------------------------
     class HandlerBase:
         def __init__(self):
