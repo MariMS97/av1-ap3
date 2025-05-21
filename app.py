@@ -334,12 +334,12 @@ def exibir_estoque_centros():
 # Exibir Histórico de Doações
 def exibir_historico_doacoes():
     print("\nHistórico de Doações")
-    doacoes = carregar_dados_json(r'jsons\doacoes.json')
-    if doacoes:
-        for d in doacoes:
-            print(f"ID: {d['id']} | Doador: {d['id_doador']} | Receptor: {d['id_receptor']} | Tipo: {d['tipo_doacao']}")
+    if Doacao.doacoes:
+        for chave, dados in Doacao.doacoes.items():
+            print(f"ID: {chave} | Tipo: {dados['tipo_doacao']} | Data: {dados['data_doacao']} | Status: {dados['status']}")
     else:
         print("Nenhuma doação registrada.")
+
 
 # Função carregar_json (silenciosa)
 def carregar_json():

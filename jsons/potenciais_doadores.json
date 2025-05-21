@@ -238,30 +238,7 @@
         },
         "intencao": {
             "status": "Confirmada",
-            "orgaos_id": []
-        }
-    },
-    {
-        "dados": {
-            "id": 12,
-            "nome": "Maria Elisa",
-            "idade": 23,
-            "genero": "F",
-            "data_nascimento": "04/06/2001",
-            "cidade_natal": "Anápolis",
-            "estado_natal": "GO",
-            "cpf": "25875395145",
-            "profissao": "Estudante",
-            "cidade_residencia": "Anápolis",
-            "estado_residencia": "GO",
-            "estado_civil": "Solteira",
-            "contato_emergencia": "61999845236",
-            "tipo_sanguineo": "O+",
-            "orgaos_disponiveis": []
-        },
-        "intencao": {
-            "data_intencao": "08/05/2025",
-            "status": "Confirmada"
+            "orgaos_id": ["Pulmoes"]
         }
     }
 ]
